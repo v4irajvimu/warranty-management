@@ -4,6 +4,40 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
+java_major() {
+  "$1/bin/java" -version 2>&1 | awk -F '"' '/version/ { split($2, v, "."); print v[1]; exit }'
+}
+
+use_jdk_21() {
+  local home major
+  local candidates=()
+  if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
+    candidates+=("$JAVA_HOME")
+  fi
+  if home="$(/usr/libexec/java_home -v 21 2>/dev/null)"; then
+    candidates+=("$home")
+  fi
+  local cached
+  for cached in "$HOME"/.cache/warranty-management/jdk-21*/Contents/Home; do
+    candidates+=("$cached")
+  done
+
+  for home in "${candidates[@]}"; do
+    [[ -x "$home/bin/java" ]] || continue
+    major="$(java_major "$home")"
+    if [[ "$major" =~ ^[0-9]+$ && "$major" -ge 21 ]]; then
+      export JAVA_HOME="$home"
+      export PATH="$JAVA_HOME/bin:$PATH"
+      return 0
+    fi
+  done
+
+  echo "Firebase emulators need JDK 21 or newer. Install one, or set JAVA_HOME to it." >&2
+  exit 1
+}
+
+use_jdk_21
+
 export VITE_USE_FIREBASE_EMULATORS=true
 export VITE_FIREBASE_API_KEY=demo-api-key
 export VITE_FIREBASE_AUTH_DOMAIN=localhost

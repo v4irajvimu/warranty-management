@@ -51,7 +51,9 @@ test('signs in an admin and opens users', async ({ page }) => {
   await signIn(page, admin.email, admin.password);
   await page.getByRole('link', { name: 'Users' }).first().click();
   await expect(page).toHaveURL(/\/users$/);
-  await expect(page.getByRole('heading', { name: 'Users' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Users' }),
+  ).toBeVisible();
   await expect(page.getByText('Alex Morgan')).toBeVisible();
 });
 

@@ -32,20 +32,17 @@ export default defineConfig({
   },
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx nx run @warranty-management/office-portal:preview',
+    command: 'bash apps/office-portal-e2e/start-guest-e2e.sh',
     url: 'http://localhost:4300',
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     cwd: workspaceRoot,
+    timeout: 180_000,
   },
+  // Firefox's Playwright build exits on this Mac with "Could not find profile folder".
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
     },
 
     {

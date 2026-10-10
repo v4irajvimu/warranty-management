@@ -1,102 +1,138 @@
-# WarrantyManagement
+# Role-Based Admin Portal
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A React admin portal with Firebase email/password authentication and role-based UI, organized as an Nx monorepo. Navigation, routes, and dashboard actions change for `admin` vs `user`.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Features
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- Email/password authentication (Firebase Auth)
+- Role-based access stored in Firestore (`admin` | `user`)
+- Dark navy MUI shell with sidebar, header page title, and profile avatar drawer
+- Dashboard with dummy metrics and role-filtered quick actions
+- Protected routes (`/users` is admin-only)
+- Vitest unit tests and Playwright end-to-end tests
+- Firebase Hosting and Firestore rules deploy scripts
 
-## Run tasks
+## Tech stack
 
-To run the dev server for your app, use:
+| Layer | Technology |
+| --- | --- |
+| Workspace | Nx 23, npm workspaces |
+| Framework | React 19, TypeScript |
+| Build | Vite |
+| Unit tests | Vitest, Testing Library |
+| End-to-end tests | Playwright |
+| UI | MUI 9 |
+| Routing | React Router 7 |
+| Backend services | Firebase Auth, Cloud Firestore |
+| Hosting | Firebase Hosting |
 
-```sh
-npx nx serve office-portal
+## Prerequisites
+
+- Node.js 20+
+- npm 10+
+- A Firebase project with Email/Password auth and Firestore enabled
+- Java, only for the authenticated emulator end-to-end tests
+
+## Getting started
+
+```bash
+npm install
+cp apps/office-portal/.env.example apps/office-portal/.env
 ```
 
-To create a production bundle:
+Fill `apps/office-portal/.env` with your Firebase web app config:
 
-```sh
-npx nx build office-portal
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_USE_FIREBASE_EMULATORS=
 ```
 
-To see all available targets to run for a project, run:
-
-```sh
-npx nx show project office-portal
+```bash
+npm run dev
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+The app runs at `http://localhost:4200`.
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Project structure
 
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/react:app demo
+```text
+apps/
+  office-portal/           # App shell: providers, routes, Vite config
+  office-portal-e2e/       # Playwright guest and authenticated flows
+libs/office-portal/
+  util/                    # Roles, routes, and navigation helpers
+  data-access/             # Firebase init, AuthProvider, useAuth
+  ui/                      # Theme and presentational components
+  feature-auth/            # Login and register pages
+  feature-shell/           # App shell, sidebar, profile, route guards
+  feature-portal/          # Dashboard, users, reports, settings
+docs/
+  PROJECT_SPEC.md          # Product and engineering spec
+  features/                # Per-feature development notes
 ```
 
-To generate a new library, use:
+Libraries are non-buildable. The office-portal Vite app compiles them. Import them by package name, for example `@warranty-management/office-portal-data-access`.
 
-```sh
-npx nx g @nx/react:lib mylib
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the office-portal dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the production build on port 4300 |
+| `npm test` | Run all unit tests |
+| `npm run test:coverage` | Run unit tests with coverage |
+| `npm run lint` | Lint every project |
+| `npm run typecheck` | Typecheck every project |
+| `npm run e2e` | Guest Playwright tests |
+| `npm run e2e:auth` | Signed-in Playwright tests against Firebase emulators |
+| `npm run format` | Format the workspace with Prettier |
+| `npm run graph` | Open the Nx project graph |
+| `npm run deploy:hosting` | Build and deploy Firebase Hosting |
+| `npm run deploy:rules` | Deploy Firestore security rules |
+| `npm run deploy` | Build and deploy Hosting and Firestore rules |
+
+## Roles
+
+| Role | Access |
+| --- | --- |
+| `user` | Dashboard, Reports, Settings (default on register) |
+| `admin` | All of the above, plus Users |
+
+Promote an admin by setting `users/{uid}.role` to `"admin"` in Firestore, then sign out and sign in again.
+
+## Firebase setup
+
+1. Create a Firebase project and register a **Web** app.
+2. Enable **Authentication → Sign-in method → Email/Password**.
+3. Create a **Firestore** database.
+4. Publish rules from [`apps/office-portal/firestore.rules`](apps/office-portal/firestore.rules) (`npm run deploy:rules`).
+5. Copy the web config into `apps/office-portal/.env`.
+6. Register in the app, then optionally promote that user to `admin`.
+
+Set `VITE_USE_FIREBASE_EMULATORS=true` only when the Auth and Firestore emulators are running.
+
+## Deployment
+
+```bash
+npx firebase login
+npm run deploy:hosting
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+Firebase project files live in `apps/office-portal/`. After the first Hosting deploy, add the Hosting domains under **Authentication → Settings → Authorized domains** if they are missing.
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Documentation
 
-## Set up CI!
+| Document | Purpose |
+| --- | --- |
+| [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) | Product spec, data model, workspace layout, and tests |
+| [docs/features/](docs/features/README.md) | Feature development notes |
 
-### Step 1
+## License
 
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Private project. All rights reserved.

@@ -3,8 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "nx": {
-    "implicitDependencies": [
-      "@warranty-management/office-portal"
-    ]
+    "implicitDependencies": ["@warranty-management/office-portal"],
+    "tags": ["scope:office-portal", "type:e2e"],
+    "targets": {
+      "e2e-auth": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "playwright test -c apps/office-portal-e2e/playwright.auth.config.mts",
+          "cwd": "{workspaceRoot}"
+        }
+      }
+    }
   }
 }

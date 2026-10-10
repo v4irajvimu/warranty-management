@@ -1,5 +1,8 @@
 {
   "name": "@warranty-management/office-portal",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "nx": {
+    "tags": ["scope:office-portal", "type:app"]
+  }
 }

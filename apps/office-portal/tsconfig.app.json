@@ -32,5 +32,25 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "references": [
+    {
+      "path": "../../libs/office-portal/util/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/office-portal/feature-shell/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/office-portal/feature-portal/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/office-portal/feature-auth/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/office-portal/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/office-portal/data-access/tsconfig.lib.json"
+    }
+  ]
 }

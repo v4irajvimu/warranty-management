@@ -3,12 +3,15 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": "out-tsc/playwright",
-    "sourceMap": false
+    "sourceMap": false,
+    "types": ["node"]
   },
   "include": [
     "**/*.ts",
     "**/*.js",
+    "**/*.mts",
     "playwright.config.mts",
+    "playwright.auth.config.mts",
     "src/**/*.spec.ts",
     "src/**/*.spec.js",
     "src/**/*.test.ts",

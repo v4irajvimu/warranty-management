@@ -2,14 +2,38 @@
   "name": "@warranty-management/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx dev @warranty-management/office-portal",
+    "dev": "nx dev @warranty-management/office-portal",
+    "build": "nx build @warranty-management/office-portal",
+    "preview": "nx preview @warranty-management/office-portal",
+    "test": "nx run-many -t test",
+    "test:coverage": "nx run-many -t test -- --coverage",
+    "lint": "nx run-many -t lint",
+    "typecheck": "nx run-many -t typecheck",
+    "e2e": "nx e2e @warranty-management/office-portal-e2e",
+    "e2e:auth": "nx e2e-auth @warranty-management/office-portal-e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "graph": "nx graph",
+    "deploy": "nx build @warranty-management/office-portal && firebase deploy --config apps/office-portal/firebase.json --project role-base-login-app",
+    "deploy:hosting": "nx build @warranty-management/office-portal && firebase deploy --only hosting --config apps/office-portal/firebase.json --project role-base-login-app",
+    "deploy:rules": "firebase deploy --only firestore:rules --config apps/office-portal/firebase.json --project role-base-login-app"
+  },
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.4.0",
+    "@mui/material": "^9.4.0",
+    "firebase": "^11.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "6.30.3"
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
     "@eslint/js": "^9.8.0",
     "@nx/devkit": "23.3.0",
     "@nx/eslint": "23.3.0",
@@ -40,6 +64,7 @@
     "eslint-plugin-playwright": "^1.6.2",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "5.0.0",
+    "firebase-tools": "^15.33.0",
     "jiti": "2.4.2",
     "jsdom": "^27.1.0",
     "nx": "23.3.0",
@@ -51,6 +76,7 @@
     "vitest": "~5.0.1"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libs/office-portal/*"
   ]
 }

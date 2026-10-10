@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { User } from 'firebase/auth';
 import {
   AuthContext,
@@ -10,15 +10,17 @@ import { theme } from '@warranty-management/office-portal-ui';
 import type { Role } from '@warranty-management/office-portal-util';
 import { DashboardPage } from './dashboard-page';
 
-function renderDashboard(role: Role) {
+function renderDashboard(role: Role | null) {
   const value: AuthContextValue = {
     user: { uid: 'uid-1' } as User,
-    profile: {
-      uid: 'uid-1',
-      displayName: 'Ada Lovelace',
-      email: 'ada@example.com',
-      role,
-    },
+    profile: role
+      ? {
+          uid: 'uid-1',
+          displayName: 'Ada Lovelace',
+          email: 'ada@example.com',
+          role,
+        }
+      : null,
     loading: false,
     configured: true,
     login: vi.fn(),
@@ -30,7 +32,10 @@ function renderDashboard(role: Role) {
     <ThemeProvider theme={theme}>
       <AuthContext.Provider value={value}>
         <MemoryRouter>
-          <DashboardPage />
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/reports" element={<p>Reports route</p>} />
+          </Routes>
         </MemoryRouter>
       </AuthContext.Provider>
     </ThemeProvider>,
@@ -49,5 +54,17 @@ describe('DashboardPage', () => {
     renderDashboard('user');
     expect(screen.queryByRole('button', { name: 'Manage Users' })).toBeNull();
     expect(screen.getByRole('button', { name: 'View Reports' })).toBeTruthy();
+  });
+
+  it('navigates when a quick action is clicked', () => {
+    renderDashboard('user');
+    fireEvent.click(screen.getByRole('button', { name: 'View Reports' }));
+    expect(screen.getByText('Reports route')).toBeTruthy();
+  });
+
+  it('shows a generic greeting and no actions without a profile', () => {
+    renderDashboard(null);
+    expect(screen.getByText(/Welcome back, user\./)).toBeTruthy();
+    expect(screen.queryByRole('button')).toBeNull();
   });
 });

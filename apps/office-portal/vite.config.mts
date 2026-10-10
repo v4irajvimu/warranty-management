@@ -37,6 +37,7 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: './test-output/vitest/coverage',
       provider: 'v8' as const,
+      thresholds: { lines: 90, statements: 90, functions: 90, branches: 90 },
     },
   },
 }));

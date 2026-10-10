@@ -25,4 +25,15 @@ describe('StatCard', () => {
     expect(screen.getByText('+12 this week')).toBeTruthy();
     expect(screen.getByText('icon')).toBeTruthy();
   });
+
+  it('omits the subtitle when none is given', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <StatCard title="Tasks" value="7" icon={StatIcon} />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText('7')).toBeTruthy();
+    expect(container.querySelector('.MuiTypography-caption')).toBeNull();
+  });
 });

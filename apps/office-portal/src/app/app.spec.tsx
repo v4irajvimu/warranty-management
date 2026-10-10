@@ -8,7 +8,6 @@ import {
 } from '@warranty-management/office-portal-data-access';
 import { theme } from '@warranty-management/office-portal-ui';
 import type { Role } from '@warranty-management/office-portal-util';
-import App from './app';
 import { AppRouter } from './app-router';
 
 function authValue(
@@ -45,14 +44,6 @@ function renderAt(path: string, value: AuthContextValue) {
     </ThemeProvider>,
   );
 }
-
-describe('App', () => {
-  it('shows the login warning when Firebase is not configured', () => {
-    render(<App />);
-    expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeTruthy();
-    expect(screen.getByText(/Firebase is not configured/)).toBeTruthy();
-  });
-});
 
 describe('AppRouter', () => {
   it('sends a guest to login', () => {

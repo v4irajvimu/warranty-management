@@ -19,4 +19,15 @@ describe('PageHeader', () => {
     expect(screen.getByText('Latest activity')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Export' })).toBeTruthy();
   });
+
+  it('renders only the title when no subtitle is given', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <PageHeader title="Settings" />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Settings' })).toBeTruthy();
+    expect(container.querySelectorAll('p')).toHaveLength(0);
+  });
 });

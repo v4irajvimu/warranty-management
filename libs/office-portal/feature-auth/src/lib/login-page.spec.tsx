@@ -93,4 +93,49 @@ describe('LoginPage', () => {
     renderLogin({ loading: true });
     expect(screen.getByText('Loading your profile…')).toBeTruthy();
   });
+
+  it('waits for the profile of a signed-in user', () => {
+    renderLogin({ user: { uid: 'uid-1' } as User });
+    expect(screen.getByText('Loading your profile…')).toBeTruthy();
+  });
+
+  it('signs in with a trimmed email and opens the dashboard', async () => {
+    const login = vi.fn().mockResolvedValue(undefined);
+    renderLogin({ login });
+
+    fillAndSubmit();
+
+    expect(login).toHaveBeenCalledWith('ada@example.com', 'secret');
+    expect(await screen.findByText('Dashboard home')).toBeTruthy();
+  });
+
+  it('falls back to a generic message for an empty Firebase error', async () => {
+    renderLogin({
+      login: vi.fn().mockRejectedValue(new Error('Firebase: (auth/unknown).')),
+    });
+
+    fillAndSubmit();
+
+    expect(await screen.findByText('Unable to sign in.')).toBeTruthy();
+  });
+
+  it('shows a generic message for a non-Error failure', async () => {
+    renderLogin({ login: vi.fn().mockRejectedValue('offline') });
+
+    fillAndSubmit();
+
+    expect(
+      await screen.findByText('Unable to sign in. Try again.'),
+    ).toBeTruthy();
+  });
 });
+
+function fillAndSubmit() {
+  fireEvent.change(screen.getByLabelText(/^email/i), {
+    target: { value: '  ada@example.com  ' },
+  });
+  fireEvent.change(screen.getByLabelText(/^password/i), {
+    target: { value: 'secret' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+}

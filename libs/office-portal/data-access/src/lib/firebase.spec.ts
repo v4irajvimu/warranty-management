@@ -71,4 +71,19 @@ describe('firebase', () => {
       8080,
     );
   });
+
+  it('uses the hosted Firebase services when emulators are off', async () => {
+    vi.stubEnv('VITE_FIREBASE_API_KEY', 'api-key');
+    vi.stubEnv('VITE_FIREBASE_AUTH_DOMAIN', 'example.firebaseapp.com');
+    vi.stubEnv('VITE_FIREBASE_PROJECT_ID', 'example');
+    vi.stubEnv('VITE_FIREBASE_APP_ID', 'app-id');
+    vi.stubEnv('VITE_USE_FIREBASE_EMULATORS', 'false');
+
+    const firebase = await loadFirebase();
+
+    expect(firebase.auth).toEqual({ kind: 'auth' });
+    expect(firebase.db).toEqual({ kind: 'db' });
+    expect(firebaseApp.connectAuthEmulator).not.toHaveBeenCalled();
+    expect(firebaseApp.connectFirestoreEmulator).not.toHaveBeenCalled();
+  });
 });

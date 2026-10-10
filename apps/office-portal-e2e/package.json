@@ -1,0 +1,10 @@
+{
+  "name": "@warranty-management/office-portal-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@warranty-management/office-portal"
+    ]
+  }
+}
